@@ -1,0 +1,39 @@
+- About the application
+
+This is v1 of a RESTful Api build in php using the Laravel framework.
+The app connects to a mysql and a mongodb database.
+We use mongodb to store the vessel data provided in the json file and mysql for our users.
+The app is built with docker, so before we start the set up make sure you have docker installed.
+
+- Installation guide
+
+RUN 'docker-compose up -d --build'
+RUN 'docker-compose exec app composer install'
+RUN 'docker-compose exec app cp .env.example .env'
+RUN 'docker-compose exec app cp .env.example .env.testing'
+RUN 'docker-compose exec app php artisan key:generate'
+RUN 'docker-compose exec app php artisan storage:link'
+
+- DB setup guide
+
+RUN 'docker-compose exec app php artisan migrate:refresh --seed'
+RUN 'docker cp .\ship_positions.json mongo-container:/ship_positions.json'
+RUN 'docker exec -it mongo-container bash'
+RUN 'mongoimport --db marinetraffic_db --collection vessels --drop --jsonArray --batchSize 1 --file ./ship_positions.json'
+RUN 'exit'
+
+- Run unit Tests
+
+RUN 'docker-compose exec app php artisan test'
+
+- HTTP docs
+
+The http requests are stored at:
+/stotage/logs/api.log
+
+- App urls
+
+app url: http://127.0.0.1:8080/
+phpmyadmin url: http://127.0.0.1:3400/
+mysql url: http://127.0.0.1:3306/
+mongodb url: http://127.0.0.1:27017/
